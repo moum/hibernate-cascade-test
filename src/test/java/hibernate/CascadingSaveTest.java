@@ -46,6 +46,14 @@ public class CascadingSaveTest {
         assertEquals(2, p2.children.size());
     }
 
+    @Test
+    public void reattachAndSaveWithChildren() {
+        final Session s1 = sessionFactory.openSession();
+        final Parent p1 = createParentWithChildren();
+        final Serializable p1Id = s1.save(p1);
+
+    }
+
     private Parent createParentWithChildren() {
         final Parent p1 = new Parent();
         p1.id = 1L;
