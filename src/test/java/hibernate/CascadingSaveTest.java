@@ -3,6 +3,7 @@ package hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,7 +18,7 @@ public class CascadingSaveTest {
 
     @Before
     public void before() {
-        Configuration configuration = new Configuration();
+        final Configuration configuration = new Configuration();
         final Properties props = new Properties();
         props.setProperty("hibernate.connection.driver_class", "org.hsqldb.jdbcDriver");
         props.setProperty("hibernate.connection.url", "jdbc:hsqldb:mem:testdb");
@@ -32,6 +33,13 @@ public class CascadingSaveTest {
         sessionFactory = configuration.buildSessionFactory();
     }
 
+    @After
+    public void after() {
+        if (sessionFactory != null) {
+            sessionFactory.close();
+        }
+    }
+
     @Test
     public void createSimpleParentChildRelationship() {
         final Session s1 = sessionFactory.openSession();
@@ -43,6 +51,8 @@ public class CascadingSaveTest {
         final Parent p2 = (Parent) s2.get(Parent.class, p1Id);
         assertEquals(p1Id, p2.id);
         assertEquals(2, p2.children.size());
+        s2.flush();
+        s2.close();
     }
 
     @Test
@@ -52,6 +62,7 @@ public class CascadingSaveTest {
         s1.save(p1);
         s1.flush();
         s1.close();
+        System.out.println("closed s1");
         final Session s2 = sessionFactory.openSession();
         p1.description = "modified";
         final Parent mergedParent = (Parent) s2.merge(p1);
@@ -67,6 +78,7 @@ public class CascadingSaveTest {
         s1.save(p1);
         s1.flush();
         s1.close();
+        System.out.println("closed s1");
         final Session s2 = sessionFactory.openSession();
         p1.description = "modified";
         p1.children.iterator().next().description = "modifiedChild";
