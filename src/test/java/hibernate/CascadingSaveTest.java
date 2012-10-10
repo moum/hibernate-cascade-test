@@ -57,6 +57,9 @@ public class CascadingSaveTest {
         s2.close();
     }
 
+    /*
+        Child updates are only triggered if the child elements do not implement equals and hashCode properly.
+     */
     @Test
     public void reattachAndSaveWithUnmodifiedChildren() {
         final Session s1 = sessionFactory.openSession();
@@ -75,6 +78,19 @@ public class CascadingSaveTest {
     /*
         Funny how collections of components (i.e. Embeddables) referred to by an entity causes all Child elements to be
         deleted and inserted on the below merge. Doesn't matter whether any child has been modified at all or not.
+
+        Funny update: Implementation of proper equals and hashCode in the Child type seems to solve this problem. I.e.
+        when implemented properly and the element has a unique id, delete-insert combinations are not triggered for all
+        elements in the embedabble collection, but a delete-insert combination *is* triggered for modified elements,
+        rather than update. However, the end result wouldn be the same.
+
+        BTW: Hibernate does not accept @Id on the @Embeddable type, neither does it allow optimistic locking on the
+        child element.
+
+        The JPA documentation suggests that this is more of a feature than a bug, ref:
+        http://en.wikibooks.org/wiki/Java_Persistence/ElementCollection#Primary_keys_in_CollectionTable.
+
+
      */
     @Test
     public void reattachAndSaveWithModifiedChildren() {
@@ -85,7 +101,8 @@ public class CascadingSaveTest {
         s1.close();
         final Session s2 = sessionFactory.openSession();
         p1.description = "modified";
-        p1.children.iterator().next().description = "modifiedChild";
+        final Child child = p1.children.iterator().next();
+        child.description = "modifiedChild";
         final Parent mergedParent = (Parent) s2.merge(p1);
         s2.flush();
         s2.close();
@@ -97,8 +114,10 @@ public class CascadingSaveTest {
         p1.description = "p1desc";
         final Child c1 = new Child();
         c1.description = "c1desc";
+        c1.id = 1L;
         final Child c2 = new Child();
         c2.description = "c2desc";
+        c2.id = 2L;
         final Set<Child> children = new HashSet<Child>();
         children.add(c1);
         children.add(c2);
