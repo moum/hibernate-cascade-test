@@ -1,6 +1,5 @@
 package hibernate;
 
-import junit.framework.Assert;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -10,7 +9,7 @@ import org.junit.Test;
 import java.io.Serializable;
 import java.util.Properties;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
 
 public class CascadingSaveTest {
 
@@ -47,7 +46,7 @@ public class CascadingSaveTest {
     }
 
     @Test
-    public void reattachAndSaveWithChildren() {
+    public void reattachAndSaveWithUnmodifiedChildren() {
         final Session s1 = sessionFactory.openSession();
         final Parent p1 = createParentWithChildren();
         s1.save(p1);
@@ -55,6 +54,22 @@ public class CascadingSaveTest {
         s1.close();
         final Session s2 = sessionFactory.openSession();
         p1.description = "modified";
+        final Parent mergedParent = (Parent) s2.merge(p1);
+        s2.flush();
+        s2.close();
+        assertEquals(p1.id, mergedParent.id);
+    }
+
+    @Test
+    public void reattachAndSaveWithModifiedChildren() {
+        final Session s1 = sessionFactory.openSession();
+        final Parent p1 = createParentWithChildren();
+        s1.save(p1);
+        s1.flush();
+        s1.close();
+        final Session s2 = sessionFactory.openSession();
+        p1.description = "modified";
+        p1.children.iterator().next().description = "modifiedChild";
         final Parent mergedParent = (Parent) s2.merge(p1);
         s2.flush();
         s2.close();
