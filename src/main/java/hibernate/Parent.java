@@ -12,7 +12,8 @@ public class Parent {
     @Id
     public Long id;
 
-    @OneToMany(cascade= CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "parent")
     public Set<Child> children = new HashSet<Child>();
 
     @Column

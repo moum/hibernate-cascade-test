@@ -50,8 +50,15 @@ public class CascadingSaveTest {
     public void reattachAndSaveWithChildren() {
         final Session s1 = sessionFactory.openSession();
         final Parent p1 = createParentWithChildren();
-        final Serializable p1Id = s1.save(p1);
-
+        s1.save(p1);
+        s1.flush();
+        s1.close();
+        final Session s2 = sessionFactory.openSession();
+        p1.description = "modified";
+        final Parent mergedParent = (Parent) s2.merge(p1);
+        s2.flush();
+        s2.close();
+        assertEquals(p1.id, mergedParent.id);
     }
 
     private Parent createParentWithChildren() {
