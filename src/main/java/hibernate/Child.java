@@ -1,14 +1,10 @@
 package hibernate;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.Embeddable;
 
-@Entity
+@Embeddable
 public class Child {
-
-    @Id
-    public Long id;
 
     @Column
     public String description;

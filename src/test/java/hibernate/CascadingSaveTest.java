@@ -8,7 +8,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -62,7 +64,6 @@ public class CascadingSaveTest {
         s1.save(p1);
         s1.flush();
         s1.close();
-        System.out.println("closed s1");
         final Session s2 = sessionFactory.openSession();
         p1.description = "modified";
         final Parent mergedParent = (Parent) s2.merge(p1);
@@ -78,7 +79,6 @@ public class CascadingSaveTest {
         s1.save(p1);
         s1.flush();
         s1.close();
-        System.out.println("closed s1");
         final Session s2 = sessionFactory.openSession();
         p1.description = "modified";
         p1.children.iterator().next().description = "modifiedChild";
@@ -93,12 +93,13 @@ public class CascadingSaveTest {
         p1.id = 1L;
         p1.description = "p1desc";
         final Child c1 = new Child();
-        c1.id = 1L;
         c1.description = "c1desc";
         final Child c2 = new Child();
-        c2.id = 2L;
         c2.description = "c2desc";
-        p1.add(c1, c2);
+        final Set<Child> children = new HashSet<Child>();
+        children.add(c1);
+        children.add(c2);
+        p1.children = children;
         return p1;
     }
 
