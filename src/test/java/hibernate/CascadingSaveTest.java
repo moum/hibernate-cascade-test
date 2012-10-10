@@ -72,6 +72,10 @@ public class CascadingSaveTest {
         assertEquals(p1.id, mergedParent.id);
     }
 
+    /*
+        Funny how collections of components (i.e. Embeddables) referred to by an entity causes all Child elements to be
+        deleted and inserted on the below merge. Doesn't matter whether any child has been modified at all or not.
+     */
     @Test
     public void reattachAndSaveWithModifiedChildren() {
         final Session s1 = sessionFactory.openSession();
