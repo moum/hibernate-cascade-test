@@ -51,7 +51,7 @@ public class CascadingSaveTest {
         s1.close();
         final Session s2 = sessionFactory.openSession();
         final Parent p2 = (Parent) s2.get(Parent.class, p1Id);
-        assertEquals(p1Id, p2.id);
+        assertEquals(p1Id, p2.getId());
         assertEquals(2, p2.children.size());
         s2.flush();
         s2.close();
@@ -69,7 +69,7 @@ public class CascadingSaveTest {
         final Parent mergedParent = (Parent) s2.merge(p1);
         s2.flush();
         s2.close();
-        assertEquals(p1.id, mergedParent.id);
+        assertEquals(p1.getId(), mergedParent.getId());
     }
 
     /*
@@ -89,12 +89,11 @@ public class CascadingSaveTest {
         final Parent mergedParent = (Parent) s2.merge(p1);
         s2.flush();
         s2.close();
-        assertEquals(p1.id, mergedParent.id);
+        assertEquals(p1.getId(), mergedParent.getId());
     }
 
     private Parent createParentWithChildren() {
         final Parent p1 = new Parent();
-        p1.id = 1L;
         p1.description = "p1desc";
         final Child c1 = new Child();
         c1.description = "c1desc";

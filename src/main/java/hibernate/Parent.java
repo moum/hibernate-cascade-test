@@ -10,7 +10,8 @@ import java.util.Set;
 public class Parent {
 
     @Id
-    public Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @ElementCollection
     @JoinTable(name = "children", joinColumns = {@JoinColumn(name = "parentId")})
@@ -19,4 +20,7 @@ public class Parent {
     @Column
     public String description;
 
+    public Long getId() {
+        return id;
+    }
 }
