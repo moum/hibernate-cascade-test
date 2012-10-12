@@ -75,8 +75,6 @@ public class CascadingSaveTest {
         s1.save(p1);
         s1.flush();
         s1.close();
-        System.out.println("saved first time");
-
         final Session s2 = sessionFactory.openSession();
         final Parent p2 = createParentWithChildren();
         p2.id = 1L;
