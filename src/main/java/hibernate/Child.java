@@ -19,16 +19,13 @@ public class Child {
 
         Child child = (Child) o;
 
-        if (!description.equals(child.description)) return false;
-        if (!id.equals(child.id)) return false;
+        if (description != null ? !description.equals(child.description) : child.description != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + description.hashCode();
-        return result;
+        return description != null ? description.hashCode() : 0;
     }
 }

@@ -51,8 +51,37 @@ public class CascadingSaveTest {
         s1.close();
         final Session s2 = sessionFactory.openSession();
         final Parent p2 = (Parent) s2.get(Parent.class, p1Id);
-        assertEquals(p1Id, p2.getId());
+        assertEquals(p1Id, p2.id);
         assertEquals(2, p2.children.size());
+        s2.flush();
+        s2.close();
+    }
+
+    /**
+     * Recreate the object state after creating a graph in a session and that session is flushed and closed. This is in
+     * order to wipe out the Hibernate proprietary collection types that are used for the Child elements. With a changed
+     * parent, it doesn't matter whether or not the children are modified, they will always be deleted and inserted. This
+     * goes for all the elements in the children collection.
+     *
+     * Note that this only happens with a Session.saveOrUpdate. A merge will handle this without delete and insert, only
+     * deleting and inserting elements that are actually touched.
+     */
+    @Test
+    public void saveWithNativeCollectionTypesWithUnmodifiedChildren() {
+        final Session s1 = sessionFactory.openSession();
+        final Parent p1 = createParentWithChildren();
+        p1.id = 1L;
+        p1.description = "desc1";
+        s1.save(p1);
+        s1.flush();
+        s1.close();
+        System.out.println("saved first time");
+
+        final Session s2 = sessionFactory.openSession();
+        final Parent p2 = createParentWithChildren();
+        p2.id = 1L;
+        p2.description = "modified";
+        s2.saveOrUpdate(p2);
         s2.flush();
         s2.close();
     }
@@ -72,7 +101,7 @@ public class CascadingSaveTest {
         final Parent mergedParent = (Parent) s2.merge(p1);
         s2.flush();
         s2.close();
-        assertEquals(p1.getId(), mergedParent.getId());
+        assertEquals(p1.id, mergedParent.id);
     }
 
     /*
@@ -106,11 +135,12 @@ public class CascadingSaveTest {
         final Parent mergedParent = (Parent) s2.merge(p1);
         s2.flush();
         s2.close();
-        assertEquals(p1.getId(), mergedParent.getId());
+        assertEquals(p1.id, mergedParent.id);
     }
 
     private Parent createParentWithChildren() {
         final Parent p1 = new Parent();
+        p1.id = 1L;
         p1.description = "p1desc";
         final Child c1 = new Child();
         c1.description = "c1desc";

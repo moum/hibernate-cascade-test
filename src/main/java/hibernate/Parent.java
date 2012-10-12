@@ -8,12 +8,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Access(javax.persistence.AccessType.FIELD)
+//@Access(javax.persistence.AccessType.FIELD)
 public class Parent {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+//    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Long id;
 
     @ElementCollection
     @JoinTable(name = "children", joinColumns = {@JoinColumn(name = "parentId")})
@@ -22,8 +22,4 @@ public class Parent {
 
     @Column
     public String description;
-
-    public Long getId() {
-        return id;
-    }
 }
